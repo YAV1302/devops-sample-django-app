@@ -1,32 +1,38 @@
 services:
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    environment:
-      DJANGO_DB_HOST: db
-      DJANGO_DB_NAME: app
-      DJANGO_DB_USER: worker
-      DJANGO_DB_PASS: worker
-      DJANGO_DB_PORT: "5432"
-      DJANGO_DEBUG: "False"
-    depends_on:
-      - db
-    ports:
-       - "8000:8000" 
-    volumes:
-      - media_data:/app/media/uploads
-
   db:
-    image: postgres:latest
+    image: postgres:13
     environment:
-      POSTGRES_DB: app
-      POSTGRES_USER: worker
-      POSTGRES_PASSWORD: worker
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASS}
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - postgres:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      start_period: 10s
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  app:
+    build: .
+    environment:
+      DJANGO_DB_HOST: ${DJANGO_DB_HOST}
+      DJANGO_DB_NAME: ${DJANGO_DB_NAME}
+      DJANGO_DB_USER: ${DJANGO_DB_USER}
+      DJANGO_DB_PASS: ${DJANGO_DB_PASS}
+      DJANGO_DB_PORT: ${DJANGO_DB_PORT}
+      DJANGO_DEBUG: ${DJANGO_DEBUG}
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - uploads:/app/media/uploads
 
 volumes:
-  postgres_data:
+  postgres:
+  uploads:

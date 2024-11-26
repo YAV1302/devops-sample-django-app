@@ -49,3 +49,26 @@ python3 manage.py migrate
 ```shell
 python3 manage.py runserver 0.0.0.0:8000
 ```
+
+<h3>Start in Docker</h3>
+
+____
+
+<h4>Requirements</h4>
+
+ Docker
+ Docker-compose
+
+Create `.env` file in the root directory. See the example in `.env.example` file.
+
+To start the application in Docker, run the following command:
+```shell
+docker-compose up --build
+```
+
+App will be available at `http://localhost:8000`
+
+To stop the application, run the following command:
+```shell
+docker-compose down
+```
