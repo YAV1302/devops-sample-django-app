@@ -1,0 +1,7 @@
+**/*.md
+**/.docker*
+**/Dockerfile
+.env
+.env.example
+**/*.yaml
+**/.git*
